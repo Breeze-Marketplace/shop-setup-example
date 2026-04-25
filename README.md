@@ -1,59 +1,56 @@
-# `shop-setup-example`
+# Shop setup example
 
-Welcome to your new `shop-setup-example` project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+Example project for a **self-hosted shop** used with [Breeze Marketplace](https://foz55-laaaa-aaaan-q6ckq-cai.icp0.io/). You can deploy with **[icp-cli](https://cli.internetcomputer.org/)** or **[dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/)**; both work with this layout, but **icp-cli is preferred**. Shop **constructor args** and **WASM** are set in **`icp.yaml`** (icp-cli) and mirrored in **`dfx.json`** (dfx) so you can use either tool.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+This repo defines two canisters (see `icp.yaml` and `dfx.json`):
 
-To learn more before you start working with `shop-setup-example`, see the following documentation available online:
+- **shop** — product catalog, orders, and related logic (WASM from [Breeze-Marketplace/Shop](https://github.com/Breeze-Marketplace/Shop) releases).
+- **media** — stores static assets (images, videos) for your shop, backed by the Internet Computer asset storage canister.
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Motoko Programming Language Guide](https://internetcomputer.org/docs/current/motoko/main/motoko)
-- [Motoko Language Quick Reference](https://internetcomputer.org/docs/current/motoko/main/language-manual)
+## Configure
 
-If you want to start working on your project right away, you might want to try the following commands:
+Edit **`icp.yaml`** if you deploy with **icp-cli** (recommended), and **`dfx.json`** if you deploy with **dfx**. If both files live in your clone, keep **shop constructor args** and **WASM/candid URLs** aligned when you change them so either tool stays correct.
 
-```bash
-cd shop-setup-example/
-dfx help
-dfx canister --help
+### Shop constructor (`init_args` / `init_arg`)
+
+The **shop** canister takes Candid constructor arguments. Set them to whatever you want (for example `name` and `description`).
+
+**icp-cli** — in `icp.yaml`, field **`init_args`** (single-quoted Candid):
+
+```yaml
+init_args: '(record { name = "My Awesome Shop"; description = ""; })'
 ```
 
-## Running the project locally
+**dfx** — in `dfx.json`, under the `shop` canister, field **`init_arg`** (JSON string; escape inner double quotes):
 
-If you want to test your project locally, you can use the following commands:
-
-```bash
-# Starts the replica, running in the background
-dfx start --background
-
-# Deploys your canisters to the replica and generates your candid interface
-dfx deploy
+```json
+"init_arg": "(record { name = \"My Awesome Shop\"; description = \"\"; })"
 ```
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+Match the record shape to the Shop WASM you use; if you change the release, check that project’s `.did` or release notes for new or renamed fields.
 
-If you have made changes to your backend canister, you can generate a new candid interface with
+### Shop WASM `url` and `sha256`
 
-```bash
-npm run generate
-```
+The shop build uses a **pre-built** `shop.wasm.gz` from GitHub. To pin a **newer (or specific) version**:
 
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
+1. Open [Breeze-Marketplace/Shop — Releases](https://github.com/Breeze-Marketplace/Shop/releases) and pick the tag you want (for example `v0.2.2`).
+2. Under **Assets**, confirm **`shop.wasm.gz`** exists for that tag. Set `build.steps[0].url` to:
 
-If you are making frontend changes, you can start a development server with
+   `https://github.com/Breeze-Marketplace/Shop/releases/download/<TAG>/shop.wasm.gz`
 
-```bash
-npm start
-```
+3. Copy the published **SHA-256** for `shop.wasm.gz` from that release’s page (usually in the release notes or next to the asset) and set `build.steps[0].sha256` to that value (lowercase hex, no spaces). It must match the file for the tag you chose.
 
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
+**dfx** — in `dfx.json`, set the shop canister’s **`wasm`** and **`candid`** URLs to the same release tag (`dfx.json` does not use a separate `sha256` for those URLs). Keep **`init_arg`** in sync with `icp.yaml`’s `init_args` if you maintain both.
 
-### Note on frontend environment variables
+## Deploy
 
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
+1. Install tooling: **[icp-cli](https://cli.internetcomputer.org/)** (preferred) and/or **[dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/)**, depending on which you use to deploy.
+2. Follow the official guide for your tool — for example [deploying to IC mainnet with icp-cli](https://cli.internetcomputer.org/0.2/guides/deploying-to-mainnet/) or the current dfx docs for mainnet. Identity, cycles, and network flags live there and change over time, so this README does not duplicate them.
+3. From this directory, deploy both canisters with either **`icp deploy --environment ic`** (preferred when using icp-cli) or **`dfx deploy --network ic`**. After a successful deploy you should have **shop** and **media** canister IDs in your tooling output or generated env files.
 
-- set`DFX_NETWORK` to `ic` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
+## Register on Breeze
+
+1. Open [Create shop — Breeze Marketplace](https://foz55-laaaa-aaaan-q6ckq-cai.icp0.io/shop/new).
+2. Choose **Self-hosted** and enter your **shop** canister ID (not the media canister).
+
+After registration, the marketplace admin experience can upload files to your **media** canister.

@@ -1,0 +1,16 @@
+# Edit shop init_args and wasm url/sha256; mirror wasm/candid/init in dfx.json if you use dfx — see README Configure.
+canisters:
+  - name: shop
+    build:
+      steps:
+        - type: pre-built
+          url: https://github.com/Breeze-Marketplace/Shop/releases/download/v0.2.1/shop.wasm.gz
+          sha256: ae7218a3278948a9654e9bc1ea47af5bbb19fd56662ad0368c19a4b4cb1f981a
+    init_args: '(record { name = "My Awesome Shop"; description = ""; })'
+
+  - name: media
+    build:
+      steps:
+        - type: pre-built
+          url: https://github.com/dfinity/sdk/releases/download/0.32.0/assetstorage.wasm.gz
+          sha256: 04e565b3425fe7510ee16b02adcfe3f01abc9a2725c82a21cb08969241debd62
