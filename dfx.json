@@ -1,0 +1,22 @@
+{
+  "canisters": {
+    "shop": {
+      "type": "custom",
+      "candid": "https://github.com/Breeze-Marketplace/Shop/releases/download/v0.1.0/shop.did",
+      "wasm": "https://github.com/Breeze-Marketplace/Shop/releases/download/v0.1.0/shop.wasm.gz"
+    },
+    "media": {
+      "type": "custom",
+      "candid": "https://github.com/dfinity/sdk/releases/download/0.32.0/assetstorage.did ",
+      "wasm": "https://github.com/dfinity/sdk/releases/download/0.32.0/assetstorage.wasm.gz"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
